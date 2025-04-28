@@ -269,7 +269,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--attack-max-n-tokens",
         type = int,
-        default = 500,
+        default = 100,
         help = "Maximum number of generated tokens for the attacker."
     )
     parser.add_argument(
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--target-max-n-tokens",
         type = int,
-        default = 150,
+        default = 100,
         help = "Maximum number of generated tokens for the target."
     )
     ##################################################
