@@ -232,9 +232,14 @@ class GPT(LanguageModel):
                 )
                 output = response.choices[0].message.content
                 break  # 成功就退出循环
-            except Exception as e:
-                print(type(e), e)
+            except (BrokenPipeError, self.openai.error.APIConnectionError) as e:
+                print('Connection error or BrokenPipe, retrying...', type(e), e)
                 time.sleep(self.API_RETRY_SLEEP)
+            except Exception as e:
+                print('Other error:', type(e), e)
+                time.sleep(self.API_RETRY_SLEEP)
+            time.sleep(self.API_QUERY_SLEEP)
+
 
         # 无论如何，这里 output 一定是有值的
         return output
@@ -263,7 +268,7 @@ class GPT(LanguageModel):
                         max_n_tokens: int, 
                         temperature: float,
                         top_p: float = 1.0,):
-        return [self.generate(conv, max_n_tokens, temperature, top_p) for conv in convs_list]
+        return [self.generate(conv, max_n_tokens, temperature, top_p) for conv in convs_list]   
      
 class PaLM():
     API_RETRY_SLEEP = 10
