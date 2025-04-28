@@ -8,6 +8,7 @@ from typing import Dict, List
 import google.generativeai as genai
 import urllib3
 from copy import deepcopy
+import json
 
 from config import LLAMA_API_LINK, VICUNA_API_LINK
 
@@ -384,4 +385,86 @@ class GeminiPro():
                         max_n_tokens: int, 
                         temperature: float,
                         top_p: float = 1.0,):
+        return [self.generate(conv, max_n_tokens, temperature, top_p) for conv in convs_list]
+
+class MixtralAPI(LanguageModel):
+    API_RETRY_SLEEP = 10
+    API_ERROR_OUTPUT = "$ERROR$"
+    API_QUERY_SLEEP = 0.5
+    API_MAX_RETRY = 20
+    API_TIMEOUT = 30
+    default_output = "I'm sorry, but I cannot assist with that request."
+    API_KEY = os.getenv("MISTRAL_API_KEY")  # 这里是 DeepInfra给的 API KEY
+
+    def __init__(self, model_name) -> None:
+        self.model_name = "mistralai/Mixtral-8x7B-Instruct-v0.1"  # ✅ DeepInfra的正确模型名
+        self.api_url = "https://api.deepinfra.com/v1/openai/chat/completions"  # ✅ DeepInfra API地址
+
+    def generate(self, conv: List[Dict], 
+                max_n_tokens: int, 
+                temperature: float,
+                top_p: float):
+        '''
+        Args:
+            conv: List of dictionaries, OpenAI API 格式
+            max_n_tokens: int, max tokens
+            temperature: float
+            top_p: float
+        Returns:
+            str: generated response
+        '''
+        output = self.API_ERROR_OUTPUT
+        headers = {
+            "Authorization": f"Bearer {self.API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        for _ in range(self.API_MAX_RETRY):
+            try:
+                # 构建请求数据
+                data = {
+                    "model": self.model_name,
+                    "messages": conv,  # OpenAI格式的messages
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "max_tokens": max_n_tokens
+                }
+
+                # 注意这里换成 urllib3 的正确调用
+                http = urllib3.PoolManager()
+                response = http.request(
+                    "POST",
+                    self.api_url,
+                    headers=headers,
+                    body=str.encode(json.dumps(data)),
+                    timeout=urllib3.Timeout(connect=self.API_TIMEOUT, read=self.API_TIMEOUT),
+                )
+
+                if response.status == 429:
+                    print("Hit 429 rate limit, retrying...")
+                    time.sleep(self.API_RETRY_SLEEP)
+                    continue
+
+                resp_json = json.loads(response.data.decode("utf-8"))
+
+                if "choices" in resp_json:
+                    output = resp_json["choices"][0]["message"]["content"]
+                else:
+                    print("MixtralAPI Error: ", resp_json)
+                    output = self.API_ERROR_OUTPUT
+
+                break  # 成功就退出retry
+            except Exception as e:
+                print('Exception in MixtralAPI.generate:', type(e), e)
+                time.sleep(self.API_RETRY_SLEEP)
+
+            time.sleep(self.API_QUERY_SLEEP)
+
+        return output
+
+    def batched_generate(self, 
+                        convs_list: List[List[Dict]],
+                        max_n_tokens: int, 
+                        temperature: float,
+                        top_p: float = 1.0):
         return [self.generate(conv, max_n_tokens, temperature, top_p) for conv in convs_list]

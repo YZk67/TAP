@@ -88,7 +88,7 @@ class AttackLLM():
         for conv, prompt in zip(convs_list, prompts_list):
             conv.append_message(conv.roles[0], prompt)
             # Get prompts
-            if "gpt" in self.model_name:
+            if "gpt" in self.model_name or "mixtral" in self.model_name:
                 full_prompts.append(conv.to_openai_api_messages())
             else:
                 conv.append_message(conv.roles[1], init_message)
@@ -123,7 +123,7 @@ class AttackLLM():
             for i, full_output in enumerate(outputs_list):
                 orig_index = indices_to_regenerate[i]
                 
-                if "gpt" not in self.model_name:
+                if "gpt" not in self.model_name or "mixtral" in self.model_name:
                     full_output = init_message + full_output
 
                 attack_dict, json_str = common.extract_json(full_output)
@@ -176,7 +176,7 @@ class TargetLLM():
         full_prompts = []
         for conv, prompt in zip(convs_list, prompts_list):
             conv.append_message(conv.roles[0], prompt)
-            if "gpt" in self.model_name:
+            if "gpt" in self.model_name or "mixtral" in self.model_name:
                 # OpenAI does not have separators
                 full_prompts.append(conv.to_openai_api_messages())
             elif "palm" in self.model_name:
@@ -222,6 +222,9 @@ def load_indiv_model(model_name):
         lm = APIModelLlama7B(model_name)
     elif model_name == 'vicuna-api-model':
         lm = APIModelVicuna13B(model_name)
+    elif model_name == "mixtral-api-model":    # 🔥 加这一段
+        from language_models import MixtralAPI
+        lm = MixtralAPI(model_name)
     else:
         model = AutoModelForCausalLM.from_pretrained(
                 model_path, 
@@ -292,6 +295,10 @@ def get_model_path_and_template(model_name):
         "gemini-pro": {
             "path": "gemini-pro",
             "template": "gemini-pro"
+        },
+        "mixtral-api-model": {   # 🔥 新加这里
+            "path": None,
+            "template": "mixtral"  # 你可以自定义，叫"mixtral"就行，稍后conv用得到
         }
     }
     path, template = full_model_dict[model_name]["path"], full_model_dict[model_name]["template"]

@@ -264,7 +264,8 @@ if __name__ == '__main__':
                  "gpt-4", 
                  "gpt-4-turbo", 
                  "gpt-4-1106-preview", # This is same as gpt-4-turbo
-                 'llama-2-api-model']
+                 'llama-2-api-model',
+                 "mixtral-api-model"]
     )
     parser.add_argument(
         "--attack-max-n-tokens",
