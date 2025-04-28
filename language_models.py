@@ -218,26 +218,45 @@ class GPT(LanguageModel):
         Returns:
             str: generated response
         '''
+        client = openai.OpenAI(timeout=self.API_TIMEOUT)
+        #output = response.choices[0].message.content
         output = self.API_ERROR_OUTPUT
         for _ in range(self.API_MAX_RETRY):
-            try: 
-                
-                response = openai.ChatCompletion.create(
-                            model = self.model_name,
-                            messages = conv,
-                            max_tokens = max_n_tokens,
-                            temperature = temperature,
-                            top_p = top_p,
-                            request_timeout = self.API_TIMEOUT,
-                            )
-                output = response["choices"][0]["message"]["content"]
-                break
-            except Exception as e: 
+            try:
+                response = client.chat.completions.create(
+                    model=self.model_name,
+                    messages=conv,
+                    max_tokens=max_n_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                )
+                output = response.choices[0].message.content
+                break  # 成功就退出循环
+            except Exception as e:
                 print(type(e), e)
                 time.sleep(self.API_RETRY_SLEEP)
+
+        # 无论如何，这里 output 一定是有值的
+        return output
+        # for _ in range(self.API_MAX_RETRY):
+        #     try: 
+                
+        #         response = client.chat.completions.create(
+        #                     model = self.model_name,
+        #                     messages = conv,
+        #                     max_tokens = max_n_tokens,
+        #                     temperature = temperature,
+        #                     top_p = top_p,
+        #                     #request_timeout = self.API_TIMEOUT,
+        #                     )
+        #         output = response["choices"][0]["message"]["content"]
+        #         break
+        #     except Exception as e: 
+        #         print(type(e), e)
+        #         time.sleep(self.API_RETRY_SLEEP)
         
-            time.sleep(self.API_QUERY_SLEEP)
-        return output 
+        #     time.sleep(self.API_QUERY_SLEEP)
+        # return output 
     
     def batched_generate(self, 
                         convs_list: List[List[Dict]],

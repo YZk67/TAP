@@ -295,6 +295,7 @@ if __name__ == '__main__':
                  'gpt-4-1106-preview', # This is same as gpt-4-turbo
                  "palm-2",
                  "gemini-pro",
+                 "gpt-4o",
                  ]
     )
     parser.add_argument(
@@ -313,7 +314,8 @@ if __name__ == '__main__':
         choices=["gpt-3.5-turbo", 
                  "gpt-4", 
                  "gpt-4-turbo", 
-                 "gpt-4-1106-preview", 
+                 "gpt-4-1106-preview",
+                 "gpt-4o", 
                  "no-evaluator"]
     )
     parser.add_argument(

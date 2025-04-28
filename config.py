@@ -1,7 +1,7 @@
-VICUNA_PATH = ".../project/vicuna-13b-v1.5/" # ADD PATH
+VICUNA_PATH = "D:/models/vicuna-13b-v1.5/" # ADD PATH
 LLAMA_PATH = ".../project/Llama-2-7b-chat-hf" # ADD PATH
 
-VICUNA_API_LINK ="https://..." # ADD LINK
+VICUNA_API_LINK = None # ADD LINK
 LLAMA_API_LINK = "https://..." # ADD LINK
 
 
