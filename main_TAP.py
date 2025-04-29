@@ -15,6 +15,8 @@ def clean_attacks_and_convs(attack_list, convs_list):
         Remove any failed attacks (which appear as None) and corresponding conversations
     """
     tmp = [(a, c) for (a, c) in zip(attack_list, convs_list) if a is not None]
+    if not tmp:
+        return [], []
     tmp = [*zip(*tmp)]
     attack_list, convs_list = list(tmp[0]), list(tmp[1])
 
@@ -300,7 +302,7 @@ if __name__ == '__main__':
                  'gpt-4-1106-preview', # This is same as gpt-4-turbo
                  "palm-2",
                  "gemini-pro",
-                 "gpt-4o",
+                 "gpt-4o"
                  ]
     )
     parser.add_argument(
@@ -320,7 +322,7 @@ if __name__ == '__main__':
                  "gpt-4", 
                  "gpt-4-turbo", 
                  "gpt-4-1106-preview",
-                 "gpt-4o", 
+                 "gpt-4o-mini", 
                  "no-evaluator"]
     )
     parser.add_argument(
