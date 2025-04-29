@@ -56,8 +56,17 @@ def prune(on_topic_scores=None,
         truncated_list = [list_[shuffled_scores[i][1]] for i in range(width) if shuffled_scores[i][0] > 0]
 
         # Ensure that the truncated list has at least two elements
-        if len(truncated_list ) == 0:
-            truncated_list = [list_[shuffled_scores[0][0]], list_[shuffled_scores[0][1]]] 
+        # if len(truncated_list ) == 0:
+        #     truncated_list = [list_[shuffled_scores[0][0]], list_[shuffled_scores[1][1]]]
+
+        if len(truncated_list) == 0:
+            if len(shuffled_scores) >= 2:
+                truncated_list = [list_[shuffled_scores[0][1]], list_[shuffled_scores[1][1]]]
+            elif len(shuffled_scores) == 1:
+                truncated_list = [list_[shuffled_scores[0][1]]]
+            else:
+                truncated_list = []
+ 
         
         return truncated_list
 
@@ -139,7 +148,11 @@ def main(args):
 
         for _ in range(attack_params['branching_factor']):
             print(f'Entering branch number {_}', flush=True)
-            convs_list_copy = copy.deepcopy(convs_list) 
+            convs_list_copy = copy.deepcopy(convs_list)
+
+            if len(convs_list_copy) == 0:
+                print("Warning: convs_list_copy is empty, skipping this branch.", flush=True)
+                continue
             
             for c_new, c_old in zip(convs_list_copy, convs_list):
                 c_new.self_id = random_string(32)
