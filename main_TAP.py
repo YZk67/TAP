@@ -187,7 +187,12 @@ def main(args):
         ############################################################
         #   QUERY AND ASSESS
         ############################################################
+        from system_prompts import get_intent_analysis_prompt
+
+        intent_analysis_prefix = get_intent_analysis_prompt()
+        adv_prompt_list_with_ia = [f"{intent_analysis_prefix}\n{prompt}" for prompt in adv_prompt_list]
         target_response_list = target_llm.get_response(adv_prompt_list)
+        #target_response_list = target_llm.get_response(adv_prompt_list_with_ia)
         print("Finished getting target responses.") 
 
         # Get judge-scores (i.e., likelihood of jailbreak) from Evaluator
