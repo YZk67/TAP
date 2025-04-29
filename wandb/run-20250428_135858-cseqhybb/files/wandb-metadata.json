@@ -1,0 +1,54 @@
+{
+  "os": "Windows-11-10.0.26100-SP0",
+  "python": "CPython 3.12.10",
+  "startedAt": "2025-04-28T20:58:58.838011Z",
+  "args": [
+    "--attack-model",
+    "mixtral-api-model",
+    "--target-model",
+    "gpt-4o",
+    "--evaluator-model",
+    "gpt-4o",
+    "--goal",
+    "test",
+    "--target-str",
+    "test_response"
+  ],
+  "program": "D:\\vsCode\\code\\TAP\\main_TAP.py",
+  "codePath": "main_TAP.py",
+  "git": {
+    "remote": "https://github.com/YZk67/TAP.git",
+    "commit": "0c321f3df3c10153a36824b6c829d97ebc1f0b54"
+  },
+  "email": "kirazhang86@gmail.com",
+  "root": "D:\\vsCode\\code\\TAP",
+  "host": "Yi777",
+  "executable": "D:\\vsCode\\code\\TAP\\.venv\\Scripts\\python.exe",
+  "codePathLocal": "main_TAP.py",
+  "cpu_count": 24,
+  "cpu_count_logical": 32,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1073741819904",
+      "used": "673008304128"
+    }
+  },
+  "memory": {
+    "total": "137194733568"
+  },
+  "cpu": {
+    "count": 24,
+    "countLogical": 32
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4090",
+      "memoryTotal": "25757220864",
+      "cudaCores": 16384,
+      "architecture": "Ada"
+    }
+  ],
+  "cudaVersion": "12.6"
+}

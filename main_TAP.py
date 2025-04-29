@@ -11,13 +11,14 @@ import common
 
 
 def clean_attacks_and_convs(attack_list, convs_list):
-    """
-        Remove any failed attacks (which appear as None) and corresponding conversations
-    """
     tmp = [(a, c) for (a, c) in zip(attack_list, convs_list) if a is not None]
+    
+    if not tmp:
+        print("Warning: No valid attacks extracted in this branch!")
+        return [], []
+
     tmp = [*zip(*tmp)]
     attack_list, convs_list = list(tmp[0]), list(tmp[1])
-
     return attack_list, convs_list
 
 def prune(on_topic_scores=None,
@@ -50,6 +51,9 @@ def prune(on_topic_scores=None,
 
     def get_first_k(list_):
         width = min(attack_params['width'], len(list_))
+
+        if len(shuffled_scores) == 0 or width == 0:
+            return []  # 👈 如果没东西，直接返回空列表
         
         truncated_list = [list_[shuffled_scores[i][1]] for i in range(width) if shuffled_scores[i][0] > 0]
 
@@ -264,7 +268,9 @@ if __name__ == '__main__':
                  "gpt-4", 
                  "gpt-4-turbo", 
                  "gpt-4-1106-preview", # This is same as gpt-4-turbo
-                 'llama-2-api-model']
+                 'llama-2-api-model',
+                 "mixtral-api-model"
+                 ]
     )
     parser.add_argument(
         "--attack-max-n-tokens",

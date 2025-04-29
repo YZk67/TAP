@@ -390,3 +390,53 @@ class GeminiPro():
                         temperature: float,
                         top_p: float = 1.0,):
         return [self.generate(conv, max_n_tokens, temperature, top_p) for conv in convs_list]
+
+class APIModelMixtral8x7B(APIModel):
+    API_HOST_LINK = "https://api.deepinfra.com/v1/inference/mistralai/Mixtral-8x7B-Instruct-v0.1"
+    MODEL_API_KEY = os.getenv("DEEPINFRA_API_KEY")
+
+    def generate(self, prompt: str, max_n_tokens: int, temperature: float, top_p: float):
+        output = self.API_ERROR_OUTPUT
+        for _ in range(self.API_MAX_RETRY):
+            try:
+                headers = {
+                    "Authorization": f"Bearer {self.MODEL_API_KEY}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "input": prompt,
+                    "parameters": {
+                        "max_new_tokens": max_n_tokens,
+                        "temperature": temperature,
+                        "top_p": top_p
+                    }
+                }
+
+                response = urllib3.request(
+                    "POST",
+                    self.API_HOST_LINK,
+                    headers=headers,
+                    timeout=urllib3.Timeout(self.API_TIMEOUT),
+                    json=payload,
+                )
+
+                resp_json = response.json()
+
+                # 正确适配Mixtral DeepInfra返回
+                if "generated_text" in resp_json:
+                    output = resp_json["generated_text"]
+                elif "outputs" in resp_json:
+                    output = resp_json["outputs"]
+                else:
+                    print("DeepInfra返回异常：", resp_json)
+                    output = self.API_ERROR_OUTPUT
+
+                break  # 成功跳出循环
+            except Exception as e:
+                print('exception!', type(e), e)
+                time.sleep(self.API_RETRY_SLEEP)
+            time.sleep(self.API_QUERY_SLEEP)
+
+        return output
+
+

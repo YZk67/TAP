@@ -68,7 +68,7 @@ class WandBLogger:
         self.logger.log({
             "iteration":iteration,
             "judge_scores":judge_scores,
-            "mean_judge_score_iter": sum(judge_scores) / len(judge_scores),
+            "mean_judge_score_iter": sum(judge_scores) / len(judge_scores) if len(judge_scores) > 0 else 0,
             "is_jailbroken":self.is_jailbroken,
             "max_judge_score":self.table["judge_scores"].max(),
             "jailbreak_prompt":self.jailbreak_prompt,
